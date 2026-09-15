@@ -1,0 +1,158 @@
+# Policy scraper configuration.
+#
+# ${VAR} and ${VAR:default} are substituted from the environment at load
+# time, so bucket names and service URLs stay out of version control.
+#
+# Adding a website = add a connector class + a block under `sources`.
+# Nothing else in this file is source-specific.
+
+version: 1
+
+run:
+  max_workers: 4            # Concurrent documents per category (HTTP sources only;
+                            # browser-backed sources are serialised automatically).
+  force_refetch: false      # true = ignore the catalog and reconvert everything.
+  dry_run: false
+  continue_on_error: true   # One bad document must not abort the run.
+  log_level: INFO
+
+# --------------------------------------------------------------------------- fetching
+
+fetching:
+  http:
+    timeout_seconds: 60
+    max_retries: 3
+    backoff_seconds: 2
+    requests_per_second: 2  # Be a polite guest on regulator infrastructure.
+    verify_tls: true
+
+  browser:
+    headless: true
+    timeout_seconds: 120
+    max_retries: 3
+    backoff_seconds: 3
+    requests_per_second: 2
+    navigation_wait_until: networkidle
+    settle_ms: 2500         # Lets the bot-wall JS challenge finish.
+    launch_args:
+      - --no-sandbox
+      - --disable-dev-shm-usage
+
+# --------------------------------------------------------------------------- conversion
+
+conversion:
+  front_matter: true        # Embed provenance metadata at the top of each .md file.
+
+  html:
+    strip_tags: [script, style, noscript, iframe, form, button]
+    strip_selectors: []
+    heading_style: ATX
+    wrap_width: 0
+
+  pdf:
+    # docling_local  -> in-process; needs the [docling] extra (~4GB of ML deps)
+    # docling_remote -> HTTP call to a standalone docling service
+    # Switching between them is config only; no code changes.
+    backend: ${DOCLING_BACKEND:docling_local}
+
+    docling_local:
+      ocr_enabled: true     # REQUIRED: NPCI circulars are scanned images with
+                            # no text layer. Without OCR they convert to nothing.
+
+      # These three are measured, not preferred. See docs/ocr-accuracy.md;
+      # re-run tools/ocr_benchmark.py before changing any of them.
+      ocr_engine: tesseract   # CER 0.109 / WER 0.150 vs easyocr's 0.145 / 0.237, ~4x faster
+      pdf_backend: pypdfium   # docling's default returns a BLANK page for some NPCI scans
+      ocr_mode: default       # full_page measured no better, and ~2x the cost
+
+      ocr_languages: [en]   # ISO 639-1; translated per engine by the converter
+      table_structure_enabled: true
+      table_mode: accurate
+      images_scale: 2.0
+      # artifacts_path: /models/docling   # pre-baked models for offline containers
+
+    docling_remote:
+      base_url: ${DOCLING_URL:http://localhost:8080}
+      convert_path: /v1/convert
+      health_path: /health
+      timeout_seconds: 900
+      max_retries: 3
+
+# --------------------------------------------------------------------------- storage
+
+storage:
+  # local -> filesystem, identical key layout to GCS (no credentials needed)
+  # gcs   -> Google Cloud Storage
+  backend: ${STORAGE_BACKEND:local}
+  root_prefix: policies
+
+  local:
+    base_path: ./data/object-store
+
+  gcs:
+    bucket: ${GCS_BUCKET:sgp-public-bucket-123}          # <-- set this before switching backend to gcs
+    project: ${GCP_PROJECT:my-sgp-lab}
+    # credentials_path: /secrets/sa.json   # omit to use Application Default Credentials
+
+# --------------------------------------------------------------------------- sources
+
+sources:
+  # ------------------------------------------------------------------ RBI
+  - name: rbi
+    type: rbi.master_directions
+    display_name: Reserve Bank of India - Master Directions
+    enabled: true
+
+    # RBI serves complete server-rendered HTML; a browser would be pure overhead.
+    fetcher: http
+
+    # An amended Master Direction is still the same instrument, so it
+    # overwrites itself at a stable key.
+    update_strategy: replace_in_place
+
+    limits:
+      # Milestone 1 caps volume. Categories are DISCOVERED from the page
+      # (~30 of them) and never hardcoded -- raising this number is the only
+      # change needed to scale up.
+      max_categories: 1
+      max_documents_per_category: 10
+
+    categories:
+      include: []   # empty = take the first max_categories discovered, in page order
+      exclude: []
+
+    options:
+      index_url: https://www.rbi.org.in/Scripts/BS_ViewMasterDirections.aspx
+      prefer: html          # Detail pages carry the full text -> lossless, no OCR.
+      min_html_chars: 1500  # Below this the page is a stub; fall back to the PDF.
+
+  # ------------------------------------------------------------------ NPCI
+  - name: npci
+    type: npci.circulars
+    display_name: National Payments Corporation of India - Circulars
+    enabled: true
+
+    # Mandatory: npci.org.in sits behind Akamai and returns 403 to every
+    # non-browser client, including server-side requests that replay the
+    # browser's own cookies.
+    fetcher: browser
+
+    # NPCI issues a new circular rather than editing an old one, so each
+    # change is preserved as a new version instead of overwriting.
+    update_strategy: new_version
+
+    limits:
+      max_categories: 3
+      max_documents_per_category: 10
+
+    categories:
+      # Products are discoverable from NPCI's own API; this pins milestone 1
+      # to the three we care about. Empty the list to take whatever is found.
+      include: [upi, imps, aeps]
+      exclude: []
+
+    options:
+      base_url: https://www.npci.org.in
+      page_size: 100
+      lookback_years: 1     # Calendar years back from today; or set `years: [2026, 2025]`.
+      sort: desc
