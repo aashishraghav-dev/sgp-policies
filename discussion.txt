@@ -1,0 +1,204 @@
+Setting up the test project (Ratchana S)
+Setup the terraform for the project inside google.com
+Keep the buckets and iam policies as defined 
+Coding and deployment pipeline  (Tushar)
+Keep code in piper and pull the code to deploy into the image which is pulled by the cloud run 
+Kokoro pipeline 
+Agent code (Ratchana)
+Instructions to llm to limit what operations it can do 
+We will have a context window to keep the skills description and tool description 
+scraping (Tushar)
+Skill 1 design
+Create tool 1 for scrapping 
+Deploy a server for docling (since it uses model in background and requrired 2-4 gb of ram/gcu)
+Policy creation (Ratchana)
+Create golden data set 
+Skill 2 design
+Create tool 2 save the data into the gcs with pedantic check
+Writing the evals for the agent (Tushar)
+Testing of agent (Ratchana & Tushar)
+
+Milestone 1 timeline - 
+S.no
+Task
+Description 
+Assignee
+Number of days
+1.
+Setting up the test project 
+Bootstrap Infra with terraform
+Create a Test Project in the GCP pantheon
+Manage the resources for a test project with Terraform, below are the resources
+Project definition
+GCS bucket setup
+IAM roles
+ Ratchana S
+2
+2.
+Coding and deployment pipeline
+This will involve following things 
+Setting up piper code location 
+Setting up a kokoro pipeline to wrap code into a container image
+Writing script to deploy the image into cloud run
+ Tushar Dubey
+3
+3.
+Scraping skill and tool
+Config mentioning websites to scrape 
+Writing skill for scraping the internet for banking data 
+Tool for scraping the internet 
+Using docling python lib to parse the data 
+Save the data in the gcs bucket
+ Tushar Dubey
+3
+4.
+
+
+Policy creation skills and tools
+Write policy authoring skill (how to create constraints from policy regulatory)
+Create a golden policy set (part of the reference in skills)
+Tool to save the policy data to GCS
+ Ratchana S
+3
+5.
+Agent code
+Create base generator agent and update the instruction for scraping and policy creation.
+Define Pydantic schema for policy data format
+ Ratchana S
+3
+6.
+Writing eval tests for agent
+Writing the evaluation test data for testing the agent, skills and tools 
+ Tushar Dubey
+2
+7.
+Manual testing of agent
+Manually testing the agent 
+ Tushar Dubey, Ratchana S
+2
+
+
+
+Final Timeline : 
+
+
+Project Phases
+Task 
+Assignee
+Estimates
+
+
+
+
+
+
+
+
+Infrastructure, Storage & Repository Setup
+Piper Repository & Code Blueprint Setup
+ Tushar Dubey
+2
+Create Test GCP Project and Write terraform to bootstrap GCP resources.
+IAM Roles and GCS
+
+
+ Ratchana S
+1
+Agent 1 — Policy Extraction 
+Small POC/Research - If Docling has to be hosted as a server/library would do the work
+ Neha Tamhanakar/
+Aashish Raghav
+1
+Small POC/Research - How long/short context is working with LLM?
+ Neha Tamhanakar/
+Aashish Raghav
+1
+
+
+Small POC/Research - Scraping strategies and storage formats research
+Expected input data size ?
+Expected source document format ?
+How efficiently scraping happens in large files ?
+Supported file formats
+What is the format of policy output data ?
+
+NOTE: Some of these questions are partially discovered during the design phase, but there are few doubts, hence this research task is added to finalize on the pain points.
+ Neha Tamhanakar/
+Aashish Raghav
+1
+Implement Document Parser Tool (Docling)
+ Tushar Dubey
+2
+Develop Policy Extraction & Metadata Skill
+Ingest golden banking dataset reference cards (KYC, AML, TXN Limits, Data Privacy).
+Enforce canonical Policy Metadata Schema
+ Tushar Dubey
+3
+Implement GCS Export Tool
+ Tushar Dubey
+1
+Implement Policy authoring and Integrate the skills and tools
+ Tushar Dubey
+3
+Write Evals to validate the agent
+ Tushar Dubey
+2
+Agent 2 — & Test data Synthesis, 
+Execution, Policy Benchmarking & Judge
+Develop Test Dataset Generation Skill
+Map banking user scenarios/journeys to specific policy categories.
+Synthesize structured tool manifests, chat history, and proposed tool invocations (actions_to_evaluate).
+Enforce schema field character/token limits to prevent Conseca runtime truncation.
+ Ratchana S
+3
+Implement Conseca PDP Server Client Tool.
+Implement authenticated HTTP client targeting the Conseca PDP endpoint (/v1/evaluate).
+ Ratchana S
+2
+Implement Test Runner Engine 
+Iterate through synthesized test files stored in GCS.
+Send requests to Conseca PDP and parse verdicts (ALLOW, DENY, ALLOW_IF_CONFIRMED) and rationales.
+Compute the TN,TP,FP,FN metrics (deterministic)
+ Ratchana S
+3
+Implement LLM-as-a-Judge Evaluation & Metrics Engine
+
+Calculate core governance metrics:
+Policy Health Score (PHS): Target $\ge 95%$.
+Policy Leakage Rate (PLR): Target 0.0% (False Negatives / Total Transactions).
+Policy Over-classification (POCR): Target <2.0% (False Positives / Total Transactions).
+Policy Alignment Index (PAI): Target <5.0% variance.
+Generate a report, with LLM feedback for each policy.
+ Ratchana S
+3
+Write Evals to validate the agent
+ Ratchana S
+2
+E2E Pipeline Testing
+
+
+ Ratchana S, Tushar Dubey,
+Neha Tamhanakar,
+Aashish Raghav
+2
+
+
+
+
+Final Timeline 
+
+Estimate per person ~ 15 days 
+Final Estimate ~ 9th october 
+
+
+Leaves 
+
+
+Tushar Dubey
+From 26th september to 5th october 
+5 days (includes gandhi jayanti and 4 days weekend)
+Ratchana S
+17th September
+7th October
+
+

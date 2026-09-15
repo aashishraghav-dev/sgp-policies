@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Run artefacts. Both are outputs of a scrape, not inputs to one:
+#   metrics/ - one JSONL file per run, read with tools/analyze_metrics.py
+#   data/    - the local object store, i.e. the GCS bucket's stand-in
+metrics/
+data/
+
+# tools/samples/ and tools/ground_truth/ are committed on purpose: the OCR
+# accuracy numbers in docs/ocr-accuracy.md are only reproducible with them.
+
+# Secrets
+.env
+*.json.key
+sa.json

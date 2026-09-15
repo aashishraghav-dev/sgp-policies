@@ -1,0 +1,43 @@
+[project]
+name = "policy-scraper"
+version = "0.1.0"
+description = "Regulatory policy scraper: discovers, converts and archives RBI/NPCI documents as markdown in object storage."
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.7",
+    "PyYAML>=6.0",
+    "httpx>=0.27",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.2",
+    "markdownify>=0.12",
+    "tenacity>=8.3",
+    "playwright>=1.44",
+    "google-cloud-storage>=2.16",
+]
+
+[project.optional-dependencies]
+# Heavy (~4GB: torch/transformers/triton). Only needed when
+# conversion.pdf.backend == "docling_local". The "docling_remote"
+# backend talks to a docling service over HTTP and needs none of this.
+#
+# easyocr is not a docling dependency but is required in practice: NPCI
+# circulars are scanned images with no text layer, so without an OCR
+# engine they convert to empty markdown.
+docling = ["docling>=2.0", "easyocr>=1.7"]
+dev = ["pytest>=8.2", "pytest-asyncio>=0.23"]
+
+[project.scripts]
+policy-scraper = "policy_scraper.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/policy_scraper"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The suite is offline by design: connectors take a Fetcher, so a stub
+# covers all parsing and diffing without touching rbi.org.in or npci.org.in.
+addopts = "-q"

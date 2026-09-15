@@ -1,0 +1,58 @@
+SOURCES:
+RBI
+Master regulations (main source)
+Circulars/Notifications for update
+Draft regulations are more important than implied regulations.
+NPCI
+Major source of information
+UPI, IMPS, NACH, AePS, NETC, NFS, RuPay
+
+
+
+Docling Usage
+Crawler
+   ↓
+Document discovery
+   ↓
+Downloader
+   ↓
+Docling
+   ↓
+Document intelligence
+
+
+
+RESOURCES URL
+RBI:
+Circular index: link  https://www.rbi.org.in/scripts/bs_circularindexdisplay.aspx/Scripts/BS_CircularIndexDisplay.aspx 
+Notifications: link  https://www.rbi.org.in/Scripts/NotificationUser.aspx/searchnew/BS_ViewMasterCirculardetails.aspx 
+Master Directions: 
+https://www.rbi.org.in/Scripts/BS_ViewMasterDirections.aspx 
+https://rbi.org.in/commonman/English/Scripts/MasterDirection.aspx 
+Master Circulars
+https://www.rbi.org.in/scripts/BS_ViewMasCirculardetails.aspx 
+https://rbi.org.in/commonman/English/Scripts/MasterCircular.aspx
+
+
+UPI Circulars
+https://www.npci.org.in/circulars/upi 
+https://www.npci.org.in/circulars/imps
+
+
+
+HOW TO GIVE URL:
+
+
+SHOULD BE USE SERVER/LIBRARY:
+Library -> Benchmarking -> Decide -> Library/Server
+(Ensure easy transition when scaling)
+
+
+
+
+Benchmarking would be good work to do:
+	-> CPU-seconds / page
+	-> RAM peak / document
+	-> pages / minute / worker
+
+
