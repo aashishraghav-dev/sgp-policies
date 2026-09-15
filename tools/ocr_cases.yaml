@@ -1,0 +1,41 @@
+# Benchmark cases for tools/ocr_benchmark.py.
+#
+# Two documents is deliberate: they are the two distinct PDF shapes NPCI
+# publishes (one that docling's default backend reads, one it silently
+# returns blank), and OCR runs take minutes each. Add a case here to widen
+# the benchmark.
+#
+# `critical` lists strings that must survive OCR intact. These are not
+# arbitrary: they are the figures and references a policy answer would be
+# wrong without -- amounts, circular numbers, effective dates. A run can
+# score a respectable CER and still be unusable if it drops a currency
+# symbol, so these are scored separately and weighted above CER.
+
+cases:
+  - id: npci-upi-oc-226a
+    pdf: samples/npci-upi-oc-226a.pdf
+    ground_truth: ground_truth/npci-upi-oc-226a.txt
+    pages: 1
+    notes: >
+      Scanned, single page. docling's default (docling_parse) backend
+      returns an empty document for this file.
+    critical:
+      - "NPCI/UPI/OC-226A/2026-27"
+      - "NPCI/UPI/OC-226/2025-26"
+      - "₹5,000"
+      - "₹10,000"
+      - "07th August 2026"
+      - "03rd July 2026"
+
+  - id: npci-upi-oc-186a
+    pdf: samples/npci-upi-oc-186a.pdf
+    ground_truth: ground_truth/npci-upi-oc-186a.txt
+    pages: 2
+    notes: Scanned, two pages, numbered lists and a styled "Tap & Pay" wordmark.
+    critical:
+      - "NPCI/UPI/OC-186A/2026-27"
+      - "NPCI/UPI/OC-186/2023-24"
+      - "₹5000"
+      - "Person-to-Merchant (P2M)"
+      - "10th September 2026"
+      - "September 20, 2019"

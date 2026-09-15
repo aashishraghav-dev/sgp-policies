@@ -22,10 +22,16 @@ logger = get_logger(__name__)
 def build_pdf_converter(config: ConversionConfig) -> DocumentConverter:
     """Instantiate the configured PDF backend (local library or service)."""
     backend = config.pdf.backend
+    # repair_currency is passed to whichever backend is chosen, so moving
+    # docling out of process cannot drop the accuracy guarantee with it.
     if backend == "docling_local":
-        return LocalDoclingConverter(config.pdf.docling_local)
+        return LocalDoclingConverter(
+            config.pdf.docling_local, repair_currency=config.pdf.repair_currency
+        )
     if backend == "docling_remote":
-        return RemoteDoclingConverter(config.pdf.docling_remote)
+        return RemoteDoclingConverter(
+            config.pdf.docling_remote, repair_currency=config.pdf.repair_currency
+        )
     raise ConfigurationError(f"Unknown PDF conversion backend {backend!r}.")
 
 

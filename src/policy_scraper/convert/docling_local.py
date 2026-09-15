@@ -23,6 +23,7 @@ from typing import Any
 from policy_scraper.config.models import DoclingLocalConfig
 from policy_scraper.convert.base import DocumentConverter, converter_registry
 from policy_scraper.convert.html import normalise_markdown
+from policy_scraper.convert.ocr_repair import apply_repair
 from policy_scraper.core.errors import ConversionError
 from policy_scraper.core.models import ContentPayload, ConversionResult, MediaType
 from policy_scraper.utils.logging import get_logger
@@ -41,8 +42,9 @@ class LocalDoclingConverter(DocumentConverter):
     name = "docling_local"
     supported_media_types = frozenset({MediaType.PDF})
 
-    def __init__(self, config: DoclingLocalConfig) -> None:
+    def __init__(self, config: DoclingLocalConfig, *, repair_currency: bool = True) -> None:
         self._config = config
+        self._repair_currency = repair_currency
         self._converter: Any | None = None
         # docling's pipeline is not documented as thread-safe and holds
         # model state; serialise access so max_workers > 1 stays safe.
@@ -172,10 +174,16 @@ class LocalDoclingConverter(DocumentConverter):
                 f"backend returns a blank page for some scans."
             )
 
+        markdown, findings = apply_repair(
+            markdown,
+            enabled=self._config.ocr_enabled and self._repair_currency,
+            origin=payload.origin_url,
+        )
         extra: dict[str, Any] = {
             "ocr": self._config.ocr_enabled,
             "engine": self._config.ocr_engine,
             "pdf_backend": self._config.pdf_backend,
+            **findings,
         }
 
         return ConversionResult(

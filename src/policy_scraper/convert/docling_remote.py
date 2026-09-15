@@ -27,6 +27,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 from policy_scraper.config.models import DoclingRemoteConfig
 from policy_scraper.convert.base import DocumentConverter, converter_registry
 from policy_scraper.convert.html import normalise_markdown
+from policy_scraper.convert.ocr_repair import apply_repair
 from policy_scraper.core.errors import ConversionError, TransientError
 from policy_scraper.core.models import ContentPayload, ConversionResult, MediaType
 from policy_scraper.utils.logging import get_logger
@@ -44,8 +45,9 @@ class RemoteDoclingConverter(DocumentConverter):
     name = "docling_remote"
     supported_media_types = frozenset({MediaType.PDF})
 
-    def __init__(self, config: DoclingRemoteConfig) -> None:
+    def __init__(self, config: DoclingRemoteConfig, *, repair_currency: bool = True) -> None:
         self._config = config
+        self._repair_currency = repair_currency
         self._client: httpx.Client | None = None
 
     def _ensure_client(self) -> httpx.Client:
@@ -103,6 +105,13 @@ class RemoteDoclingConverter(DocumentConverter):
         if not markdown.strip():
             raise ConversionError(f"docling service returned empty markdown for {payload.origin_url}.")
 
+        # Repair runs client-side for both backends. The service is asked
+        # to return OCR output unrepaired, so the findings are attributed
+        # to the document here rather than lost at the service boundary.
+        markdown, findings = apply_repair(
+            markdown, enabled=self._repair_currency, origin=payload.origin_url
+        )
+
         page_count = next((body[k] for k in _PAGE_COUNT_KEYS if isinstance(body.get(k), int)), None)
         return ConversionResult(
             markdown=markdown,
@@ -110,7 +119,7 @@ class RemoteDoclingConverter(DocumentConverter):
             source_media_type=MediaType.PDF,
             page_count=page_count,
             duration_seconds=round(time.perf_counter() - started, 3),
-            extra={"service": self._config.base_url},
+            extra={"service": self._config.base_url, **findings},
         )
 
     def health_check(self) -> bool:

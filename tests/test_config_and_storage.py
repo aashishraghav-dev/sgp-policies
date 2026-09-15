@@ -157,6 +157,16 @@ class TestShippedConfig:
         assert docling.ocr_engine == "tesseract"
         assert docling.ocr_mode == "default"
 
+    def test_currency_repair_stays_on(self, monkeypatch):
+        """No OCR engine reads the rupee sign. With this off, wrong amounts
+        reach the corpus unflagged.
+
+        It lives on the PDF config rather than under a backend on purpose:
+        switching to a docling service must not drop it.
+        """
+        monkeypatch.delenv("STORAGE_BACKEND", raising=False)
+        assert load_config("config/sources.yaml").conversion.pdf.repair_currency
+
 
 class TestLocalObjectStore:
     def store(self, tmp_path: Path) -> LocalObjectStore:

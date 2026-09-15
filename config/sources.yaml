@@ -55,6 +55,11 @@ conversion:
     # Switching between them is config only; no code changes.
     backend: ${DOCLING_BACKEND:docling_local}
 
+    # Applies to whichever backend is selected: no OCR engine tested reads
+    # the rupee sign, and moving docling out of process must not quietly
+    # drop the fix. Repairs what is unambiguous, flags the rest.
+    repair_currency: true
+
     docling_local:
       ocr_enabled: true     # REQUIRED: NPCI circulars are scanned images with
                             # no text layer. Without OCR they convert to nothing.
@@ -114,7 +119,7 @@ sources:
       # Milestone 1 caps volume. Categories are DISCOVERED from the page
       # (~30 of them) and never hardcoded -- raising this number is the only
       # change needed to scale up.
-      max_categories: 1
+      max_categories: 5
       max_documents_per_category: 10
 
     categories:

@@ -1,0 +1,30 @@
+NPCI/UPI/OC-186A/2026-27
+10th September 2026
+To,
+Members and UPI Application Providers - Unified Payments Interface (UPI)
+Subject: Enhancement - UPI Tap & Pay on Point of Sale (PoS)
+With reference to UPI Operating Circular NPCI/UPI/OC-186/2023-24 dated 19th December 2023, UPI Tap & Pay through Near Field Communication (NFC) on QR was introduced as an additional mode for initiating UPI transactions. In addition to QR, UPI Tap & Pay shall now be extended to Point of Sale (PoS) terminals enabling Users to make contactless (NFC-based) UPI payments by unlocking their mobile device and tapping it on the PoS terminal.
+Key Guidelines
+1. Members and UPI Application Providers shall ensure that UPI Tap & Pay transactions on PoS terminals are accepted only for Person-to-Merchant (P2M) transactions.
+2. Members and UPI Application Providers shall ensure explicit User consent is obtained for enabling UPI Tap & Pay feature, with Users having the ability to opt out at any time.
+3. Members and UPI Application Providers shall ensure that per transaction limit is capped at ₹5000, up to which additional factor of authentication shall not be required.
+4. Members and UPI Application Providers shall ensure that settlement, reconciliation, dispute management, and Online Dispute Resolution (ODR) for UPI Tap & Pay transactions are carried out in accordance with the extant UPI guidelines as per applicability.
+5. Members shall be guided by RBI guidelines on 'Harmonization of Turn Around Time (TAT) and customer compensation for failed transactions using authorized Payment Systems' dated September 20, 2019, as amended from time to time.
+6. Members and UPI Application Providers shall refer to the applicable UPI Tap & Pay Feature Document, Technical Specifications and other instructions issued by NPCI from time to time for detailed functional, technical and operational requirements.
+Payee PSP
+1. Payee PSP shall enable UPI Tap & Pay only on NFC-enabled PoS terminals that are certified in accordance with the Payment Card Industry PIN Transaction Security / Contactless Payments on Commercial Off-The-Shelf (COTS) devices (PCI PTS / CPOC) standards.
+2. Payee PSP shall integrate the Point-of-Sale Common Library for UPI (PoS CL) at the PoS terminal and complete the integration on all the PoS terminals under its acquiring network.
+Page 1 of 2
+1001A, The Capital, B Wing, 10th Floor, Bandra Kurla Complex, Bandra (E), Mumbai 400 051.
+UPI Application Provider
+1. UPI Application Providers / PSP Banks shall ensure explicit User consent is obtained after each device binding operation before allowing further transactions using UPI Tap & Pay.
+2. UPI Application Providers shall ensure that device lock is enabled as a prerequisite for activating UPI Tap & Pay. Further, the device shall be in an unlocked state at the time of initiating a UPI Tap & Pay transaction.
+3. UPI Application Providers shall ensure that UPI Tap & Pay is made available through a dedicated call-to-action. The functionality shall be presented as a standalone feature and shall not be embedded within any other service, feature, or menu category.
+Remitter Bank
+1. Remitter Bank shall validate the User's account for UPI Tap & Pay feature enablement status before processing each transaction.
+Further, Members & UPI Application Providers shall be consulted to provide option to Users to set their own transaction limits within the aforesaid ceiling of ₹5000.
+Yours sincerely,
+SD/-
+Sourabh Tomar
+Deputy Chief - UPI Product
+Page 2 of 2

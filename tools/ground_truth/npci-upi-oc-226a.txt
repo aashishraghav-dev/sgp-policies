@@ -1,0 +1,18 @@
+NPCI/UPI/OC-226A/2026-27
+03rd July 2026
+To,
+All UPI Member Issuer Banks, PSP Banks and UPI Applications
+Dear Sir/Madam,
+Subject: Enhancement of Transaction Limit for On-Device Biometric Authentication in UPI
+Reference is drawn to NPCI circular NPCI/UPI/OC-226/2025-26 dated 07th October 2025, wherein On-Device Biometric Authentication (Fingerprint, Face, etc) was introduced as an additional option for authentication in lieu of UPI PIN.
+In view of increasing adoption in the ecosystem, it has been decided to revise the per-transaction limit for On-Device Biometric Authentication (fingerprint, face, etc.) in UPI is hereby enhanced from ₹5,000 to ₹10,000, effective 07th August 2026.
+Issuer Banks, PSP Banks and UPI Applications to ensure adequate customer communication regarding the updated limit.
+All existing validations, compliance requirements, specifications, and regulatory guidelines shall continue to remain fully applicable, and participants are required to ensure adherence.
+Yours faithfully,
+SD/-
+Sourabh Tomar
+Deputy Chief UPI Product
+1001A, The Capital, B Wing, 10th Floor, Bandra Kurla Complex, Bandra (E), Mumbai 400 051.
+T: +91 22 40009100 F: +91 22 40009101
+contact@npci.org.in www.npci.org.in
+CIN: U74990MH2008NPL189067

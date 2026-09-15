@@ -163,6 +163,17 @@ class DoclingRemoteConfig(_Base):
 
 class PdfConversionConfig(_Base):
     backend: Literal["docling_local", "docling_remote"] = "docling_local"
+    repair_currency: bool = Field(
+        default=True,
+        description=(
+            "No OCR engine tested reads the rupee sign; they emit %, ¥, $, "
+            "< or nothing. Repairs the unambiguous cases and flags the rest "
+            "rather than letting a wrong amount through silently. Sits here "
+            "rather than under a backend because it is a property of the "
+            "documents, not of where docling runs -- switching to a service "
+            "must not quietly drop it."
+        ),
+    )
     docling_local: DoclingLocalConfig = Field(default_factory=DoclingLocalConfig)
     docling_remote: DoclingRemoteConfig = Field(default_factory=DoclingRemoteConfig)
 

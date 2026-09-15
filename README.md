@@ -179,6 +179,19 @@ without re-running the benchmark will quietly degrade accuracy:
 | `ocr_engine` | `tesseract` | CER 0.109 / WER 0.150 vs easyocr's 0.145 / 0.237, and ~4× faster |
 | `ocr_mode` | `default` | `full_page` scores no better and misread `₹5,000` as `25,000` |
 
+**No OCR engine tested reads the rupee sign.** They emit `%`, `¥`, `$`, `<`
+or nothing at all. Raising the render scale and adding Devanagari language
+data changed nothing. Since a wrong amount in a banking policy is worse than
+a missing one, [convert/ocr_repair.py](src/policy_scraper/convert/ocr_repair.py)
+repairs the spans where a rewrite cannot destroy a correct reading, records
+the ones it rewrites so they stay auditable, and **flags rather than guesses**
+the amounts it cannot verify. The findings travel in each document's front
+matter, so an agent reading `amounts_unverifiable: 2` knows to cite the PDF.
+
+Full evidence, including the hypotheses that were tested and disproved:
+[docs/ocr-accuracy.md](docs/ocr-accuracy.md). Re-run the benchmark with
+`python tools/ocr_benchmark.py` before touching any of it.
+
 ### Running docling as a service
 
 `conversion.pdf.backend` switches between `docling_local` (in-process) and
@@ -279,11 +292,17 @@ fail silently:
 - `version` vs `path_version` under both update strategies
 - NPCI items with no attached file
 - that `config/sources.yaml` itself still loads and keeps OCR enabled
+- post-OCR currency repair, against literals taken verbatim from real engine
+  output — including that `25,000` misread from `₹5,000` is flagged and
+  *never* rewritten
 - that a metrics write failure disables recording instead of killing the run
 
 Two of these were written, then deliberately broken to confirm they fail:
-reverting the HTML-entity fix and the layout-table parent check each failed
-exactly the tests that claim to cover them.
+reverting the HTML-entity fix, the layout-table parent check, the OCR audit
+tiers and the currency year-guard each failed exactly the tests that claim to
+cover them. A test that passes for the wrong reason was found this way — a
+trailing full stop, not the year guard, was what made an assertion pass — and
+that bug is now fixed in both the code and the test.
 
 ---
 
